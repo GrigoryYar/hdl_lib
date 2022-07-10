@@ -35,16 +35,21 @@ module async_fifo16
         output  wire    DOUT_DV
     );
 
-reg [3:0] r_wr_pointer = 4'h0;
-reg [3:0] r_rd_pointer = 4'h0;
+reg [3:0] r_wr_pointer = 4'h1;
+reg [3:0] r_wr_pointer_g = 4'h0;
+reg [3:0] r_wr_pointer_g1 = 4'h0;
+reg [3:0] r_wr_pointer_g2 = 4'h0;
+
+reg [3:0] r_rd_pointer = 4'h1;
+reg [3:0] r_rd_pointer_g = 4'h0;
 
 reg [15:0]  r_data;
 reg         r_dout;
-reg r_dout_dv = 1'b0;
-wire w_not_equal;
-reg  r_not_equal;
+reg         r_dout_dv = 1'b0;
+wire        w_not_equal;
+reg         r_not_equal;
 
-assign w_not_equal = (r_wr_pointer == r_rd_pointer) ? 1'b0 : 1'b1;
+assign w_not_equal = (r_wr_pointer_g2 == r_rd_pointer_g) ? 1'b0 : 1'b1;
 assign DOUT_DV = r_not_equal;
 assign DOUT = r_dout;
 
@@ -53,8 +58,9 @@ always @(posedge W_CLK)
 begin
     if( DIN_DV )
     begin
-        r_data[{r_wr_pointer[3], r_wr_pointer[3]^r_wr_pointer[2], r_wr_pointer[2]^r_wr_pointer[1], r_wr_pointer[1]^r_wr_pointer[0]}] <= DIN;
+        r_data[r_wr_pointer_g] <= DIN;
         r_wr_pointer <= r_wr_pointer + 1'b1;
+        r_wr_pointer_g <= {r_wr_pointer[3], r_wr_pointer[3:1]^r_wr_pointer[2:0] };
     end
 end
 
@@ -63,9 +69,13 @@ begin
     if(w_not_equal)
     begin
         r_rd_pointer <= r_rd_pointer + 1'b1;
+        r_rd_pointer_g <= {r_rd_pointer[3], r_rd_pointer[3:1]^r_rd_pointer[2:0] };
     end
     r_not_equal <= w_not_equal;
-    r_dout <= r_data[{r_rd_pointer[3], r_rd_pointer[3]^r_rd_pointer[2], r_rd_pointer[2]^r_rd_pointer[1], r_rd_pointer[1]^r_rd_pointer[0]}];
+    r_dout <= r_data[r_rd_pointer_g];
+
+    r_wr_pointer_g1 <= r_wr_pointer_g;
+    r_wr_pointer_g2 <= r_wr_pointer_g1;
 end
 
 
