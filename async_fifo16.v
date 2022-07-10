@@ -53,7 +53,7 @@ always @(posedge W_CLK)
 begin
     if( DIN_DV )
     begin
-        r_data[r_wr_pointer] <= DIN;
+        r_data[{r_wr_pointer[3], r_wr_pointer[3]^r_wr_pointer[2], r_wr_pointer[2]^r_wr_pointer[1], r_wr_pointer[1]^r_wr_pointer[0]}] <= DIN;
         r_wr_pointer <= r_wr_pointer + 1'b1;
     end
 end
@@ -65,6 +65,8 @@ begin
         r_rd_pointer <= r_rd_pointer + 1'b1;
     end
     r_not_equal <= w_not_equal;
-    r_dout <= r_data[r_rd_pointer];
+    r_dout <= r_data[{r_rd_pointer[3], r_rd_pointer[3]^r_rd_pointer[2], r_rd_pointer[2]^r_rd_pointer[1], r_rd_pointer[1]^r_rd_pointer[0]}];
 end
+
+
 endmodule
