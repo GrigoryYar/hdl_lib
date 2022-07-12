@@ -21,23 +21,26 @@ wire DOUT_DV;
 
 integer i;
 
+parameter PERIOD_WR = 60;
+parameter PERIOD_RD = 17;
 
-always #5 W_CLK = ~W_CLK;
-always #17 R_CLK = ~R_CLK;
+always #(PERIOD_WR/2) W_CLK = ~W_CLK;
+always #(PERIOD_RD/2) R_CLK = ~R_CLK;
 
 initial begin
-    #100;
+    #(10*PERIOD_WR);
     DIN_DV = 1;
-    #10
+    #(PERIOD_WR)
     DIN_DV = 0;
 
-    #100;
-    for (i = 0; i < 15; i = i + 1 ) begin
+    #(100*PERIOD_WR);
+    for (i = 0; i < 15; i = i + 1 ) 
+    begin
         DIN = !DIN;
         DIN_DV = 1;
-        #10;
+        #(PERIOD_WR);
         DIN_DV = 0;
-        #10;
+        #(PERIOD_WR);
     end
 end
 
@@ -53,6 +56,20 @@ async_fifo16
         .DOUT_DV    (DOUT_DV )  // out, u[1], output data valid
     );
 
-
+reg FIFO_OUT = 0;
+initial
+begin
+    forever 
+    begin
+        
+        @(posedge R_CLK)
+    
+        if(DOUT_DV)
+        begin
+            FIFO_OUT <= DOUT;
+            $display("FIFO_OUT",FIFO_OUT);
+        end
+    end 
+end
 
 endmodule
