@@ -25,14 +25,17 @@ async_fifo16
 */
 
 module async_fifo16
+    #(
+        parameter WIDTH = 2 
+    )
     (
-        input   wire    W_CLK,
-        input   wire    DIN,
-        input   wire    DIN_DV,
+        input   wire                W_CLK,
+        input   wire [WIDTH-1:0]    DIN,
+        input   wire                DIN_DV,
 
-        input   wire    R_CLK,
-        output  wire    DOUT,
-        output  wire    DOUT_DV
+        input   wire                R_CLK,
+        output  wire [WIDTH-1:0]    DOUT,
+        output  wire                DOUT_DV
     );
 
 reg [3:0] r_wr_pointer = 4'h1;
@@ -43,11 +46,11 @@ reg [3:0] r_wr_pointer_g2 = 4'h0;
 reg [3:0] r_rd_pointer = 4'h1;
 reg [3:0] r_rd_pointer_g = 4'h0;
 
-reg [15:0]  r_data;
-reg         r_dout;
-reg         r_dout_dv = 1'b0;
-wire        w_not_equal;
-reg         r_not_equal;
+reg [WIDTH-1:0] r_data [15:0];
+reg [WIDTH-1:0] r_dout;
+reg             r_dout_dv = 1'b0;
+wire            w_not_equal;
+reg             r_not_equal;
 
 assign w_not_equal = (r_wr_pointer_g2 == r_rd_pointer_g) ? 1'b0 : 1'b1;
 assign DOUT_DV = r_not_equal;
