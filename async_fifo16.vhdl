@@ -14,13 +14,16 @@ use IEEE.std_logic_unsigned.all;
 
 
 entity async_fifo16 is
+    generic (
+        WIDTH : integer := 1
+    );
     port
     (
         W_CLK   : in std_logic;
-        DIN     : in std_logic;
+        DIN     : in std_logic_vector (WIDTH-1 downto 0);
         DIN_DV  : in std_logic;
         R_CLK   : in std_logic;
-        DOUT    : out std_logic; 
+        DOUT    : out std_logic_vector (WIDTH-1 downto 0); 
         DOUT_DV : out std_logic 
     );
 end async_fifo16;
@@ -35,9 +38,10 @@ architecture rtl of async_fifo16 is
     signal r_rd_pointer     : std_logic_vector (3 downto 0) := 4d"1";
     signal r_rd_pointer_g   : std_logic_vector (3 downto 0) := (others => '0');
  
-    signal r_data           : std_logic_vector (15 downto 0) := (others => '0');
+    type   ram_buffer is array (15 downto 0) of std_logic_vector (WIDTH-1 downto 0);
+    signal r_data           : ram_buffer;
 
-    signal r_dout           : std_logic := '0';
+    signal r_dout           : std_logic_vector (WIDTH-1 downto 0) := (others => '0');
     signal r_dout_dv        : std_logic := '0';
 
     signal w_not_empty      : std_logic;
@@ -45,8 +49,8 @@ architecture rtl of async_fifo16 is
 
 begin
 
-    DOUT_DV <= r_not_equal;
-    DOUT <= r_dout;
+    DOUT_DV     <= r_not_equal;
+    DOUT        <= r_dout;
     w_not_empty <= '0' when r_wr_pointer_g2 = r_rd_pointer_g else '1';
 
     proc_write:
