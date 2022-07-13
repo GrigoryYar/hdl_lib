@@ -12,6 +12,9 @@
 
 /*
 async_fifo16
+    #(
+        .WIDTH(1)
+    )
     async_fifo16_inst
     (
         .W_CLK      ( ), // in,  u[1], write clock
@@ -50,7 +53,7 @@ reg [WIDTH-1:0] r_data [15:0];
 reg [WIDTH-1:0] r_dout;
 reg             r_dout_dv = 1'b0;
 wire            w_not_equal;
-reg             r_not_equal;
+reg             r_not_equal = 1'b0;
 
 assign w_not_equal = (r_wr_pointer_g2 == r_rd_pointer_g) ? 1'b0 : 1'b1;
 assign DOUT_DV = r_not_equal;
